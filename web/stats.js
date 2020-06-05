@@ -62,6 +62,13 @@ function renderPage() {
 		p.appendChild(document.createTextNode('Mode: ' + data["game_mode"] + ' | Map: ' + data["current_map"]));
 		container.appendChild(p);
 
+		// MOTD: Z
+		if (data["motd"] !== "") {
+			p = document.createElement("p");
+			p.appendChild(document.createTextNode('MOTD: ' + data["motd"]));
+			container.appendChild(p);
+		}
+
 		// Line before next server
 		hr = document.createElement("hr");
 		container.appendChild(hr);
