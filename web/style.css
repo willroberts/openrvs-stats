@@ -1,0 +1,17 @@
+body {
+	padding: 0px 10px 0px 10px;/*top right bottom left*/
+}
+
+* {
+	font-family: "Roboto", Arial, Helvetica, sans-serif;
+}
+
+p {
+	font-size: 20px;
+}
+
+button {
+	padding: 2px 5px 2px 5px;/*top right bottom left*/
+	margin: 0px 0px 0px 10px;/*top right bottom left*/
+	font-size: 14px;
+}

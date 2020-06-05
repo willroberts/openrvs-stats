@@ -41,7 +41,6 @@ func main() {
 						wg.Done()
 						return
 					}
-					// Only add if not exists.
 					lock.Lock()
 					for _, s := range Servers {
 						if info.IP == s.IP && info.Port == s.Port {
@@ -61,7 +60,7 @@ func main() {
 	}()
 
 	http.HandleFunc("/servers", func(w http.ResponseWriter, r *http.Request) {
-		b, err := json.Marshal(Servers) // todo: b from html/template
+		b, err := json.Marshal(Servers)
 		if err != nil {
 			log.Println("marshal error:", err)
 			w.Write([]byte("error"))
@@ -70,8 +69,9 @@ func main() {
 		w.Write(b)
 	})
 
+	// TODO: Move static files to static file server.
 	http.HandleFunc("/index.html", func(w http.ResponseWriter, r *http.Request) {
-		b, err := ioutil.ReadFile("index.html") // todo: b from html/template
+		b, err := ioutil.ReadFile("web/index.html")
 		if err != nil {
 			log.Println("read error:", err)
 			w.Write([]byte("error"))
@@ -79,9 +79,17 @@ func main() {
 		w.Header().Add("Content-Type", "text/html")
 		w.Write(b)
 	})
-
+	http.HandleFunc("/style.css", func(w http.ResponseWriter, r *http.Request) {
+		b, err := ioutil.ReadFile("web/style.css")
+		if err != nil {
+			log.Println("read error:", err)
+			w.Write([]byte("error"))
+		}
+		w.Header().Add("Content-Type", "text/css")
+		w.Write(b)
+	})
 	http.HandleFunc("/stats.js", func(w http.ResponseWriter, r *http.Request) {
-		b, err := ioutil.ReadFile("stats.js") // todo: b from html/template
+		b, err := ioutil.ReadFile("web/stats.js")
 		if err != nil {
 			log.Println("read error:", err)
 			w.Write([]byte("error"))
