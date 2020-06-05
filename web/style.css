@@ -11,7 +11,38 @@ p {
 }
 
 button {
-	padding: 2px 5px 2px 5px;/*top right bottom left*/
+	cursor: pointer;
+	border: none;
+	outline: none;
+	color: #c33;
+	background-color: #fff;
+	padding: 2px 5px 2px 0px;/*top right bottom left*/
 	margin: 0px 0px 0px 10px;/*top right bottom left*/
-	font-size: 14px;
+	font-size: 18px;
+}
+
+table {
+	margin: 10px;
+	padding: 0px;
+	border: 1px solid black;
+}
+
+th, td {
+	margin: 0px;
+	padding: 4px;
+	text-align: left;
+}
+
+.collapsible {
+	background-color: #fff;
+}
+
+.collapsible:hover {
+	background-color: #ddd;
+}
+
+.playerlist, .maplist, .settingslist {
+	padding: 0 18px;
+	display: none;
+	overflow: hidden;
 }

@@ -19,7 +19,7 @@ var Servers = make([]ServerInfo, 0)
 func main() {
 	go pollServers()
 
-	http.HandleFunc("/servers", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		b, err := json.Marshal(Servers)
 		if err != nil {
 			log.Println("marshal error:", err)
@@ -90,6 +90,7 @@ func pollServers() {
 				for _, s := range Servers {
 					if info.IP == s.IP && info.Port == s.Port {
 						wg.Done()
+						lock.Unlock()
 						return
 					}
 				}
@@ -143,8 +144,13 @@ func populateBeaconData(input Input) (ServerInfo, error) {
 		IP:             report.IPAddress,
 		Port:           report.Port,
 		MapName:        report.CurrentMap,
-		GameMode:       FriendlyGameModes[report.CurrentMode],
 		MOTD:           report.MOTD,
+	}
+	mode, ok := FriendlyGameModes[report.CurrentMode]
+	if !ok {
+		info.GameMode = report.CurrentMode
+	} else {
+		info.GameMode = mode
 	}
 	var players = make([]Player, 0)
 	for i := 0; i < len(report.ConnectedPlayerNames); i++ {
@@ -165,7 +171,12 @@ func populateBeaconData(input Input) (ServerInfo, error) {
 	for i := 0; i < limiter; i++ {
 		var m Map
 		m.Name = report.MapRotation[i]
-		m.Mode = FriendlyGameModes[report.ModeRotation[i]]
+		mode, ok := FriendlyGameModes[report.ModeRotation[i]]
+		if !ok {
+			m.Mode = report.ModeRotation[i]
+		} else {
+			m.Mode = mode
+		}
 		maps = append(maps, m)
 	}
 	info.Maps = maps
