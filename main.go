@@ -21,7 +21,6 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	//
 	var wg sync.WaitGroup
 	var lock = sync.RWMutex{}
 	for _, input := range inputs {
@@ -44,7 +43,6 @@ func main() {
 		}(input)
 	}
 	wg.Wait()
-	//
 	b, err := json.Marshal(Servers)
 	if err != nil {
 		log.Fatal(err)
@@ -120,7 +118,7 @@ func populateBeaconData(input Input) (ServerInfo, error) {
 		maps = append(maps, m)
 	}
 	info.Maps = maps
-	if registry.GameTypes[info.GameMode] == "adv" {
+	if registry.GameTypes[report.CurrentMode] == "adv" {
 		var pvp PVPSettings
 		pvp.AutoTeamBalance = report.AutoTeamBalance
 		if report.CurrentMode == "Bomb" {
