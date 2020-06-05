@@ -41,7 +41,14 @@ func main() {
 						wg.Done()
 						return
 					}
+					// Only add if not exists.
 					lock.Lock()
+					for _, s := range Servers {
+						if info.IP == s.IP && info.Port == s.Port {
+							wg.Done()
+							return
+						}
+					}
 					Servers = append(Servers, info)
 					lock.Unlock()
 					wg.Done()
@@ -60,6 +67,26 @@ func main() {
 			w.Write([]byte("error"))
 		}
 		w.Header().Add("Content-Type", "application/json")
+		w.Write(b)
+	})
+
+	http.HandleFunc("/index.html", func(w http.ResponseWriter, r *http.Request) {
+		b, err := ioutil.ReadFile("index.html") // todo: b from html/template
+		if err != nil {
+			log.Println("read error:", err)
+			w.Write([]byte("error"))
+		}
+		w.Header().Add("Content-Type", "text/html")
+		w.Write(b)
+	})
+
+	http.HandleFunc("/stats.js", func(w http.ResponseWriter, r *http.Request) {
+		b, err := ioutil.ReadFile("stats.js") // todo: b from html/template
+		if err != nil {
+			log.Println("read error:", err)
+			w.Write([]byte("error"))
+		}
+		w.Header().Add("Content-Type", "application/javascript")
 		w.Write(b)
 	})
 
