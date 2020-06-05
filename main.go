@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -50,7 +49,11 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(string(b))
+	http.HandleFunc("/servers", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Add("Content-Type", "application/json")
+		w.Write(b)
+	})
+	log.Fatal(http.ListenAndServe(":8081", nil))
 }
 
 func getHostPorts() ([]Input, error) {
@@ -200,5 +203,5 @@ var FriendlyGameModes = map[string]string{
 	"RGM_HostageRescueCoopMode": "Hostage Rescue",
 	"RGM_MissionMode":           "Mission",
 	"RGM_TeamDeathmatchMode":    "Team Survival",
-	"RGM_TerroristHuntCoopMode": "Terrorist Hun",
+	"RGM_TerroristHuntCoopMode": "Terrorist Hunt",
 }
