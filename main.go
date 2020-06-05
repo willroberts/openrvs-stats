@@ -22,6 +22,7 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	//
 	var wg sync.WaitGroup
 	var lock = sync.RWMutex{}
 	for _, input := range inputs {
@@ -44,6 +45,7 @@ func main() {
 		}(input)
 	}
 	wg.Wait()
+	//
 	b, err := json.Marshal(Servers)
 	if err != nil {
 		log.Fatal(err)
@@ -89,7 +91,7 @@ func populateBeaconData(input Input) (ServerInfo, error) {
 		IP:             report.IPAddress,
 		Port:           report.Port,
 		MapName:        report.CurrentMap,
-		GameMode:       report.CurrentMode,
+		GameMode:       FriendlyGameModes[report.CurrentMode],
 		MOTD:           report.MOTD,
 	}
 	var players = make([]Player, 0)
@@ -111,14 +113,14 @@ func populateBeaconData(input Input) (ServerInfo, error) {
 	for i := 0; i < limiter; i++ {
 		var m Map
 		m.Name = report.MapRotation[i]
-		m.Mode = report.ModeRotation[i]
+		m.Mode = FriendlyGameModes[report.ModeRotation[i]]
 		maps = append(maps, m)
 	}
 	info.Maps = maps
 	if registry.GameTypes[info.GameMode] == "adv" {
 		var pvp PVPSettings
 		pvp.AutoTeamBalance = report.AutoTeamBalance
-		if report.CurrentMode == "RGM_BombAdvMode" {
+		if report.CurrentMode == "Bomb" {
 			pvp.BombTimer = report.BombTimer
 		}
 		pvp.FriendlyFire = report.FriendlyFire
@@ -188,4 +190,15 @@ type CoopSettings struct {
 	RoundsPerMatch     int  `json:"rounds_per_match"`
 	TimePerRound       int  `json:"time_per_round"`
 	TimeBetweenRounds  int  `json:"time_between_rounds"`
+}
+
+var FriendlyGameModes = map[string]string{
+	"RGM_BombAdvMode":           "Bomb",
+	"RGM_DeathmatchMode":        "Survival",
+	"RGM_EscortAdvMode":         "Escort the Pilot",
+	"RGM_HostageRescueAdvMode":  "Hostage",
+	"RGM_HostageRescueCoopMode": "Hostage Rescue",
+	"RGM_MissionMode":           "Mission",
+	"RGM_TeamDeathmatchMode":    "Team Survival",
+	"RGM_TerroristHuntCoopMode": "Terrorist Hun",
 }
