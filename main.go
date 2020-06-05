@@ -17,40 +17,53 @@ import (
 var Servers = make([]ServerInfo, 0)
 
 func main() {
-	inputs, err := getHostPorts()
-	if err != nil {
-		log.Fatal(err)
-	}
-	var wg sync.WaitGroup
-	var lock = sync.RWMutex{}
-	for _, input := range inputs {
-		wg.Add(1)
-		go func(input Input) {
-			info, err := populateBeaconData(input)
+	go func() {
+		for {
+			log.Println("getting latest servers")
+			inputs, err := getHostPorts()
 			if err != nil {
-				log.Println("beacon error:", err)
-				wg.Done()
-				return
+				log.Fatal(err)
 			}
-			if info.CurrentPlayers == 0 {
-				wg.Done()
-				return
+
+			log.Println("getting server info")
+			var wg sync.WaitGroup
+			var lock = sync.RWMutex{}
+			for _, input := range inputs {
+				wg.Add(1)
+				go func(input Input) {
+					info, err := populateBeaconData(input)
+					if err != nil {
+						log.Println("beacon error:", err)
+						wg.Done()
+						return
+					}
+					if info.CurrentPlayers == 0 {
+						wg.Done()
+						return
+					}
+					lock.Lock()
+					Servers = append(Servers, info)
+					lock.Unlock()
+					wg.Done()
+				}(input)
 			}
-			lock.Lock()
-			Servers = append(Servers, info)
-			lock.Unlock()
-			wg.Done()
-		}(input)
-	}
-	wg.Wait()
-	b, err := json.Marshal(Servers)
-	if err != nil {
-		log.Fatal(err)
-	}
+			wg.Wait()
+			log.Println("server info updated, waiting 30s")
+			time.Sleep(30 * time.Second)
+		}
+	}()
+
 	http.HandleFunc("/servers", func(w http.ResponseWriter, r *http.Request) {
+		b, err := json.Marshal(Servers) // todo: b from html/template
+		if err != nil {
+			log.Println("marshal error:", err)
+			w.Write([]byte("error"))
+		}
 		w.Header().Add("Content-Type", "application/json")
 		w.Write(b)
 	})
+
+	log.Println("listening on http/8081")
 	log.Fatal(http.ListenAndServe(":8081", nil))
 }
 
