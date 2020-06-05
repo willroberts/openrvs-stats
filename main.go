@@ -17,47 +17,7 @@ import (
 var Servers = make([]ServerInfo, 0)
 
 func main() {
-	go func() {
-		for {
-			log.Println("getting latest servers")
-			inputs, err := getHostPorts()
-			if err != nil {
-				log.Fatal(err)
-			}
-
-			log.Println("getting server info")
-			var wg sync.WaitGroup
-			var lock = sync.RWMutex{}
-			for _, input := range inputs {
-				wg.Add(1)
-				go func(input Input) {
-					info, err := populateBeaconData(input)
-					if err != nil {
-						log.Println("beacon error:", err)
-						wg.Done()
-						return
-					}
-					if info.CurrentPlayers == 0 {
-						wg.Done()
-						return
-					}
-					lock.Lock()
-					for _, s := range Servers {
-						if info.IP == s.IP && info.Port == s.Port {
-							wg.Done()
-							return
-						}
-					}
-					Servers = append(Servers, info)
-					lock.Unlock()
-					wg.Done()
-				}(input)
-			}
-			wg.Wait()
-			log.Println("server info updated, waiting 30s")
-			time.Sleep(30 * time.Second)
-		}
-	}()
+	go pollServers()
 
 	http.HandleFunc("/servers", func(w http.ResponseWriter, r *http.Request) {
 		b, err := json.Marshal(Servers)
@@ -100,6 +60,49 @@ func main() {
 
 	log.Println("listening on http/8081")
 	log.Fatal(http.ListenAndServe(":8081", nil))
+}
+
+func pollServers() {
+	for {
+		inputs, err := getHostPorts()
+		if err != nil {
+			log.Println(err)
+			continue
+		}
+
+		var wg sync.WaitGroup
+		var lock = sync.RWMutex{}
+		for _, input := range inputs {
+			wg.Add(1)
+
+			go func(input Input) {
+				info, err := populateBeaconData(input)
+				if err != nil {
+					log.Println("beacon error:", err)
+					wg.Done()
+					return
+				}
+				if info.CurrentPlayers == 0 {
+					wg.Done()
+					return
+				}
+				lock.Lock()
+				for _, s := range Servers {
+					if info.IP == s.IP && info.Port == s.Port {
+						wg.Done()
+						return
+					}
+				}
+				Servers = append(Servers, info)
+				lock.Unlock()
+				wg.Done()
+			}(input)
+
+		}
+		wg.Wait()
+		log.Println("server info updated")
+		time.Sleep(30 * time.Second)
+	}
 }
 
 func getHostPorts() ([]Input, error) {
