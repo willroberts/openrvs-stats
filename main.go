@@ -57,10 +57,11 @@ func pollServers() {
 					return
 				}
 				lock.Lock()
-				for _, s := range Servers {
+				for i, s := range Servers {
 					if info.IP == s.IP && info.Port == s.Port {
-						wg.Done()
+						Servers[i] = info
 						lock.Unlock()
+						wg.Done()
 						return
 					}
 				}
