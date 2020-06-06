@@ -32,7 +32,7 @@ func main() {
 		w.Write(b)
 	})
 	log.Println("listening on http://127.0.0.1:8081")
-	log.Fatal(http.ListenAndServe("127.0.0.7:8081", nil))
+	log.Fatal(http.ListenAndServe("127.0.0.1:8081", nil))
 }
 
 func pollServers() {
