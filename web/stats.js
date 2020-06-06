@@ -47,7 +47,7 @@ function renderPage() {
 
 		// Server Name (0/8)
 		var h4 = document.createElement("h4");
-		h4.appendChild(document.createTextNode(data["server_name"] + ' (' + data["current_players"] + '/' + data["max_players"] + ')'));
+		h4.appendChild(document.createTextNode(data["server_name"] + ' (' + data["current_players"] + '/' + data["max_players"] + ') '));
 
 		// [Click to copy IP:Port]
 		var b = document.createElement("button");
