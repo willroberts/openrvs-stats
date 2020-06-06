@@ -21,12 +21,13 @@ var beaconInterval = 15 * time.Second
 func main() {
 	go pollServers()
 
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/stats.json", func(w http.ResponseWriter, r *http.Request) {
 		b, err := json.Marshal(Servers)
 		if err != nil {
 			log.Println("marshal error:", err)
 			w.Write([]byte("error"))
 		}
+		w.Header().Add("Access-Control-Allow-Origin", "*")
 		w.Header().Add("Content-Type", "application/json")
 		w.Write(b)
 	})
