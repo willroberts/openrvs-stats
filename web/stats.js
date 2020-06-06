@@ -118,7 +118,6 @@ function createDataTables(data) { // data is json server info
 
 function createButton(label) {
 	b = document.createElement("button");
-	b.className = "collapsible";
 	b.appendChild(document.createTextNode(label));
 	b.addEventListener("click", collapseButtonHandler);
 	return b;
