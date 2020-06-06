@@ -15,6 +15,8 @@ import (
 )
 
 var Servers = make([]ServerInfo, 0)
+var beaconTimeout = 5 * time.Second
+var beaconInterval = 15 * time.Second
 
 func main() {
 	go pollServers()
@@ -76,7 +78,7 @@ func pollServers() {
 		}
 		wg.Wait()
 		log.Println("server info updated")
-		time.Sleep(30 * time.Second)
+		time.Sleep(beaconInterval)
 	}
 }
 
@@ -107,7 +109,7 @@ func getHostPorts() ([]Input, error) {
 }
 
 func populateBeaconData(input Input) (ServerInfo, error) {
-	report, err := beacon.GetServerReport(input.IP, input.Port+1000, 5*time.Second)
+	report, err := beacon.GetServerReport(input.IP, input.Port+1000, beaconTimeout)
 	if err != nil {
 		return ServerInfo{}, err
 	}
