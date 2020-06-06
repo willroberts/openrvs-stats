@@ -116,8 +116,6 @@ function createDataTables(data) { // data is json server info
 	return table;
 }
 
-//	table.appendChild(addTableHeaderRow(['Active Players', 'Map Rotation', 'Settings']));
-
 function createButton(label) {
 	b = document.createElement("button");
 	b.className = "collapsible";
