@@ -85,7 +85,7 @@ func pollServers() {
 
 func getHostPorts() ([]Input, error) {
 	var inputs = make([]Input, 0)
-	resp, err := http.Get("http://64.225.54.237:8080/servers")
+	resp, err := http.Get("http://127.0.0.1:8080/servers")
 	if err != nil {
 		return nil, err
 	}
