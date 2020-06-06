@@ -52,24 +52,27 @@ func pollServers() {
 					wg.Done()
 					return
 				}
-				if info.CurrentPlayers == 0 {
-					wg.Done()
-					return
-				}
 				lock.Lock()
 				for i, s := range Servers {
+					// Server is already in the list, update or remove it.
 					if info.IP == s.IP && info.Port == s.Port {
-						Servers[i] = info
+						if info.CurrentPlayers > 0 {
+							Servers[i] = info
+						} else {
+							Servers = append(Servers[:i], Servers[i+1:]...)
+						}
 						lock.Unlock()
 						wg.Done()
 						return
 					}
 				}
-				Servers = append(Servers, info)
+				// Server is not in the list, add it.
+				if info.CurrentPlayers > 0 {
+					Servers = append(Servers, info)
+				}
 				lock.Unlock()
 				wg.Done()
 			}(input)
-
 		}
 		wg.Wait()
 		log.Println("server info updated")
