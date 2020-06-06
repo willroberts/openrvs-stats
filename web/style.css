@@ -1,13 +1,17 @@
-body {
+* {
+	font-family: Arial, Helvetica, sans-serif;
+}
+
+body { 
 	padding: 0px 10px 0px 10px;/*top right bottom left*/
 }
 
-* {
-	font-family: "Roboto", Arial, Helvetica, sans-serif;
+h1, h2, h3, h4, h5, h6 {
+	margin: 0px;
 }
 
 p {
-	font-size: 20px;
+	margin: 6px;
 }
 
 button {
@@ -16,33 +20,36 @@ button {
 	outline: none;
 	color: #c33;
 	background-color: #fff;
-	padding: 2px 5px 2px 0px;/*top right bottom left*/
+	padding: 4px;
 	margin: 0px 0px 0px 10px;/*top right bottom left*/
-	font-size: 18px;
+	font-size: 16px;
 }
 
-table {
-	margin: 10px;
-	padding: 0px;
-	border: 1px solid black;
+button:hover {
+	background-color: #ddd;
 }
 
 th, td {
 	margin: 0px;
 	padding: 4px;
 	text-align: left;
+	vertical-align: top;
 }
 
-.collapsible {
-	background-color: #fff;
+.outertable {
+	margin: 10px;
+	padding: 0px;
+	border: 0px;
 }
 
-.collapsible:hover {
-	background-color: #ddd;
-}
-
-.playerlist, .maplist, .settingslist {
-	padding: 0 18px;
+.innertable {
+	margin: 10px;
+	padding: 0px;
+	border: 1px solid black;
 	display: none;
 	overflow: hidden;
+}
+
+.small {
+	font-size: 12px;
 }
