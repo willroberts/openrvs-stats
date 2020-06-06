@@ -35,11 +35,6 @@ window.onload = function () {
 // Render the page.
 function renderPage() {
 	container = document.getElementById("jscontainer");
-	h1 = document.createElement("h1");
-	h1.appendChild(document.createTextNode("Raven Shield: Who's online now?"));
-	container.appendChild(h1);
-	container.appendChild(document.createElement("hr"));
-
 	var i;
 	for (i = 0; i < stats.length; i++) {
 		var data = stats[i];
