@@ -28,36 +28,6 @@ func main() {
 		w.Header().Add("Content-Type", "application/json")
 		w.Write(b)
 	})
-
-	// TODO: Move static files to static file server.
-	http.HandleFunc("/index.html", func(w http.ResponseWriter, r *http.Request) {
-		b, err := ioutil.ReadFile("web/index.html")
-		if err != nil {
-			log.Println("read error:", err)
-			w.Write([]byte("error"))
-		}
-		w.Header().Add("Content-Type", "text/html")
-		w.Write(b)
-	})
-	http.HandleFunc("/style.css", func(w http.ResponseWriter, r *http.Request) {
-		b, err := ioutil.ReadFile("web/style.css")
-		if err != nil {
-			log.Println("read error:", err)
-			w.Write([]byte("error"))
-		}
-		w.Header().Add("Content-Type", "text/css")
-		w.Write(b)
-	})
-	http.HandleFunc("/stats.js", func(w http.ResponseWriter, r *http.Request) {
-		b, err := ioutil.ReadFile("web/stats.js")
-		if err != nil {
-			log.Println("read error:", err)
-			w.Write([]byte("error"))
-		}
-		w.Header().Add("Content-Type", "application/javascript")
-		w.Write(b)
-	})
-
 	log.Println("listening on http/8081")
 	log.Fatal(http.ListenAndServe(":8081", nil))
 }
