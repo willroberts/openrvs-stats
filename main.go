@@ -31,8 +31,8 @@ func main() {
 		w.Header().Add("Content-Type", "application/json")
 		w.Write(b)
 	})
-	log.Println("listening on http/8081")
-	log.Fatal(http.ListenAndServe(":8081", nil))
+	log.Println("listening on http://127.0.0.1:8081")
+	log.Fatal(http.ListenAndServe("127.0.0.7:8081", nil))
 }
 
 func pollServers() {
@@ -110,7 +110,11 @@ func getHostPorts() ([]Input, error) {
 }
 
 func populateBeaconData(input Input) (ServerInfo, error) {
-	report, err := beacon.GetServerReport(input.IP, input.Port+1000, beaconTimeout)
+	b, err := beacon.GetServerReport(input.IP, input.Port+1000, beaconTimeout)
+	if err != nil {
+		return ServerInfo{}, err
+	}
+	report, err := beacon.ParseServerReport(input.IP, b)
 	if err != nil {
 		return ServerInfo{}, err
 	}
