@@ -141,7 +141,7 @@ func populateBeaconData(input Input) (ServerInfo, error) {
 	for i := 0; i < len(report.MapRotation); i++ {
 		var m Map
 		m.Name = report.MapRotation[i]
-		m.Mode = "unknown"
+		m.Mode = "Unknown"
 		if i < len(report.ModeRotation) {
 			mode, ok := FriendlyGameModes[report.ModeRotation[i]]
 			if ok {
