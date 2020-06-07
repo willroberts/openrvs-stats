@@ -17,10 +17,10 @@
     current server list, made available in JSON format
     <a href="http://64.225.54.237/stats.json">here</a>.<br /><br />
     <b>Known issues:</b><br />
-    - The game mode for the last map in a map rotation is sometimes garbled.
-      This is a bug in the UDP beacon library.<br />
-    - Special characters don't seem to render properly; this may also be an
-      issue in the beacon library.<br /><br />
+    - The game modes for maps are often unknown. This is because the beacon text
+      exceeds the typical UDP limit of 512 bytes. Data loss generally begins
+      around 1700 bytes. This appears to only affect game modes; all other data
+      is present.<br /><br />
     <a href="https://github.com/ijemafe/openrvs-stats">Source Code</a> | 
     <a href="https://github.com/ijemafe/openrvs-beacon">Beacon Library</a>
   </p>
