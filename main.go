@@ -125,7 +125,7 @@ func populateBeaconData(input Input) (ServerInfo, error) {
 		IP:             report.IPAddress,
 		Port:           report.Port,
 		MapName:        report.CurrentMap,
-		GameMode:       report.CurrentMode,
+		GameMode:       FriendlyGameModes[report.CurrentMode],
 		MOTD:           report.MOTD,
 	}
 	var players = make([]Player, 0)
