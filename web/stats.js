@@ -159,7 +159,7 @@ function generateSettingsTable(data) { // data is json server info
 		table.appendChild(addTableRow(['Friendly Fire', boolToOnOff(s["friendly_fire"])]));
 		table.appendChild(addTableRow(['Rounds Per Match', s["rounds_per_match"]]));
 		table.appendChild(addTableRow(['Time Per Round', s["time_per_round"]]));
-		table.appendChild(addTableRow(['Time_Between_Rounds', s["time_between_rounds"]]));
+		table.appendChild(addTableRow(['Time Between Rounds', s["time_between_rounds"]]));
 	} else {
 		var s = data["coop_settings"];
 		table.appendChild(addTableRow(['AI Backup', boolToOnOff(s["ai_backup"])]));
