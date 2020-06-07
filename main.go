@@ -125,13 +125,8 @@ func populateBeaconData(input Input) (ServerInfo, error) {
 		IP:             report.IPAddress,
 		Port:           report.Port,
 		MapName:        report.CurrentMap,
+		GameMode:       report.CurrentMode,
 		MOTD:           report.MOTD,
-	}
-	mode, ok := FriendlyGameModes[report.CurrentMode]
-	if !ok {
-		info.GameMode = report.CurrentMode
-	} else {
-		info.GameMode = mode
 	}
 	var players = make([]Player, 0)
 	for i := 0; i < len(report.ConnectedPlayerNames); i++ {
@@ -143,20 +138,15 @@ func populateBeaconData(input Input) (ServerInfo, error) {
 	}
 	info.Players = players
 	var maps = make([]Map, 0)
-	var limiter int
-	if len(report.MapRotation) >= len(report.ModeRotation) {
-		limiter = len(report.ModeRotation)
-	} else {
-		limiter = len(report.MapRotation)
-	}
-	for i := 0; i < limiter; i++ {
+	for i := 0; i < len(report.MapRotation); i++ {
 		var m Map
 		m.Name = report.MapRotation[i]
-		mode, ok := FriendlyGameModes[report.ModeRotation[i]]
-		if !ok {
-			m.Mode = report.ModeRotation[i]
-		} else {
-			m.Mode = mode
+		m.Mode = "unknown"
+		if i < len(report.ModeRotation) {
+			mode, ok := FriendlyGameModes[report.ModeRotation[i]]
+			if ok {
+				m.Mode = mode
+			}
 		}
 		maps = append(maps, m)
 	}
