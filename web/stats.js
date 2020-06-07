@@ -138,10 +138,10 @@ function generatePlayersTable(data) { // data is json server info
 function generateMapsTable(data) { // data is json server info
 	var table = document.createElement("table");
 	table.className = "innertable";
-	table.appendChild(addTableHeaderRow(['Map', 'Game Mode']));
+	table.appendChild(addTableHeaderRow(['Map Name']));
 	for (j = 0; j < data["maps"].length; j++) {
 		var m = data["maps"][j];
-		table.appendChild(addTableRow([m["name"], m["mode"]]));
+		table.appendChild(addTableRow([j+1 + '. ' + m["name"]]));
 	}
 	return table;
 }
