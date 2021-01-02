@@ -101,6 +101,7 @@ func main() {
 	log.Fatal(http.ListenAndServe("127.0.0.1:8081", nil))
 }
 
+// Continuously refreshes beacon data every `beaconInterval` seconds.
 func pollServers() {
 	for {
 		hostports, err := getHostPorts()
