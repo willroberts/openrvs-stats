@@ -17,10 +17,72 @@ import (
 const RegistryURL = "http://127.0.0.1:8080/servers"
 
 var (
-	Servers	       = make([]ServerInfo, 0)
-	beaconTimeout  = 5 * time.Second
-	beaconInterval = 15 * time.Second
+	beaconTimeout     = 5 * time.Second
+	beaconInterval    = 15 * time.Second
+	FriendlyGameModes = map[string]string{
+		"RGM_BombAdvMode":           "Bomb",
+		"RGM_DeathmatchMode":        "Survival",
+		"RGM_EscortAdvMode":         "Escort the Pilot",
+		"RGM_HostageRescueAdvMode":  "Hostage",
+		"RGM_HostageRescueCoopMode": "Hostage Rescue",
+		"RGM_MissionMode":           "Mission",
+		"RGM_TeamDeathmatchMode":    "Team Survival",
+		"RGM_TerroristHuntCoopMode": "Terrorist Hunt",
+	}
 )
+
+type HostPort struct {
+	IP   string
+	Port int
+}
+
+type ServerInfo struct {
+	ServerName     string       `json:"server_name"`
+	CurrentPlayers int          `json:"current_players"`
+	MaxPlayers     int          `json:"max_players"`
+	IP             string       `json:"ip_address"`
+	Port           int          `json:"port"`
+	MapName        string       `json:"current_map"`
+	GameMode       string       `json:"game_mode"`
+	MOTD           string       `json:"motd"`
+	Players        []Player     `json:"players"`
+	Maps           []Map        `json:"maps"`
+	PVPSettings    PVPSettings  `json:"pvp_settings"`
+	CoopSettings   CoopSettings `json:"coop_settings"`
+}
+
+type Player struct {
+	Name  string `json:"name"`
+	Kills int    `json:"kills"`
+	Time  string `json:"time"`
+}
+
+type Map struct {
+	Name string `json:"name"`
+	Mode string `json:"mode"`
+}
+
+type PVPSettings struct {
+	AutoTeamBalance   bool `json:"auto_team_balance"`
+	BombTimer         int  `json:"bomb_timer"`
+	FriendlyFire      bool `json:"friendly_fire"`
+	RoundsPerMatch    int  `json:"rounds_per_match"`
+	TimePerRound      int  `json:"time_per_round"`
+	TimeBetweenRounds int  `json:"time_between_rounds"`
+}
+
+type CoopSettings struct {
+	AIBackup           bool `json:"ai_backup"`
+	FriendlyFire       bool `json:"friendly_fire"`
+	TerroristCount     int  `json:"terrorist_count"`
+	RotateMapOnSuccess bool `json:"rotate_map_on_success"`
+	RoundsPerMatch     int  `json:"rounds_per_match"`
+	TimePerRound       int  `json:"time_per_round"`
+	TimeBetweenRounds  int  `json:"time_between_rounds"`
+}
+
+// Global server cache.
+var Servers = make([]ServerInfo, 0)
 
 func main() {
 	go pollServers()
@@ -41,7 +103,7 @@ func main() {
 
 func pollServers() {
 	for {
-		inputs, err := getHostPorts()
+		hostports, err := getHostPorts()
 		if err != nil {
 			log.Println(err)
 			continue
@@ -49,11 +111,11 @@ func pollServers() {
 
 		var wg sync.WaitGroup
 		var lock = sync.RWMutex{}
-		for _, input := range inputs {
+		for _, hp := range hostports {
 			wg.Add(1)
 
-			go func(input Input) {
-				info, err := populateBeaconData(input)
+			go func(hp HostPort) {
+				info, err := populateBeaconData(hp)
 				if err != nil {
 					log.Println("beacon error:", err)
 					wg.Done()
@@ -79,7 +141,7 @@ func pollServers() {
 				}
 				lock.Unlock()
 				wg.Done()
-			}(input)
+			}(hp)
 		}
 		wg.Wait()
 		log.Println("server info updated")
@@ -87,8 +149,9 @@ func pollServers() {
 	}
 }
 
-func getHostPorts() ([]Input, error) {
-	var inputs = make([]Input, 0)
+// Retrieves healthy servers from openrvs-registry.
+func getHostPorts() ([]HostPort, error) {
+	var hostports = make([]HostPort, 0)
 	resp, err := http.Get(RegistryURL)
 	if err != nil {
 		return nil, err
@@ -108,17 +171,17 @@ func getHostPorts() ([]Input, error) {
 			log.Println("atoi error:", err)
 			continue
 		}
-		inputs = append(inputs, Input{IP: host, Port: port})
+		hostports = append(hostports, HostPort{IP: host, Port: port})
 	}
-	return inputs, nil
+	return hostports, nil
 }
 
-func populateBeaconData(input Input) (ServerInfo, error) {
-	b, err := beacon.GetServerReport(input.IP, input.Port+1000, beaconTimeout)
+func populateBeaconData(hp HostPort) (ServerInfo, error) {
+	b, err := beacon.GetServerReport(hp.IP, hp.Port+1000, beaconTimeout)
 	if err != nil {
 		return ServerInfo{}, err
 	}
-	report, err := beacon.ParseServerReport(input.IP, b)
+	report, err := beacon.ParseServerReport(hp.IP, b)
 	if err != nil {
 		return ServerInfo{}, err
 	}
@@ -178,65 +241,4 @@ func populateBeaconData(input Input) (ServerInfo, error) {
 		info.CoopSettings = coop
 	}
 	return info, nil
-}
-
-type Input struct {
-	IP   string
-	Port int
-}
-
-type ServerInfo struct {
-	ServerName     string       `json:"server_name"`
-	CurrentPlayers int          `json:"current_players"`
-	MaxPlayers     int          `json:"max_players"`
-	IP             string       `json:"ip_address"`
-	Port           int          `json:"port"`
-	MapName        string       `json:"current_map"`
-	GameMode       string       `json:"game_mode"`
-	MOTD           string       `json:"motd"`
-	Players        []Player     `json:"players"`
-	Maps           []Map        `json:"maps"`
-	PVPSettings    PVPSettings  `json:"pvp_settings"`
-	CoopSettings   CoopSettings `json:"coop_settings"`
-}
-
-type Player struct {
-	Name  string `json:"name"`
-	Kills int    `json:"kills"`
-	Time  string `json:"time"`
-}
-
-type Map struct {
-	Name string `json:"name"`
-	Mode string `json:"mode"`
-}
-
-type PVPSettings struct {
-	AutoTeamBalance   bool `json:"auto_team_balance"`
-	BombTimer         int  `json:"bomb_timer"`
-	FriendlyFire      bool `json:"friendly_fire"`
-	RoundsPerMatch    int  `json:"rounds_per_match"`
-	TimePerRound      int  `json:"time_per_round"`
-	TimeBetweenRounds int  `json:"time_between_rounds"`
-}
-
-type CoopSettings struct {
-	AIBackup           bool `json:"ai_backup"`
-	FriendlyFire       bool `json:"friendly_fire"`
-	TerroristCount     int  `json:"terrorist_count"`
-	RotateMapOnSuccess bool `json:"rotate_map_on_success"`
-	RoundsPerMatch     int  `json:"rounds_per_match"`
-	TimePerRound       int  `json:"time_per_round"`
-	TimeBetweenRounds  int  `json:"time_between_rounds"`
-}
-
-var FriendlyGameModes = map[string]string{
-	"RGM_BombAdvMode":           "Bomb",
-	"RGM_DeathmatchMode":        "Survival",
-	"RGM_EscortAdvMode":         "Escort the Pilot",
-	"RGM_HostageRescueAdvMode":  "Hostage",
-	"RGM_HostageRescueCoopMode": "Hostage Rescue",
-	"RGM_MissionMode":           "Mission",
-	"RGM_TeamDeathmatchMode":    "Team Survival",
-	"RGM_TerroristHuntCoopMode": "Terrorist Hunt",
 }
