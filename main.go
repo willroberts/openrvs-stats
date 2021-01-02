@@ -14,9 +14,13 @@ import (
 	registry "github.com/ijemafe/openrvs-registry"
 )
 
-var Servers = make([]ServerInfo, 0)
-var beaconTimeout = 5 * time.Second
-var beaconInterval = 15 * time.Second
+const RegistryURL = "http://127.0.0.1:8080/servers"
+
+var (
+	Servers	       = make([]ServerInfo, 0)
+	beaconTimeout  = 5 * time.Second
+	beaconInterval = 15 * time.Second
+)
 
 func main() {
 	go pollServers()
@@ -85,7 +89,7 @@ func pollServers() {
 
 func getHostPorts() ([]Input, error) {
 	var inputs = make([]Input, 0)
-	resp, err := http.Get("http://127.0.0.1:8080/servers")
+	resp, err := http.Get(RegistryURL)
 	if err != nil {
 		return nil, err
 	}
