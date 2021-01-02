@@ -4,7 +4,7 @@ This repo contains:
 
 - A Go service (`main.go`) which fetches healthy servers from [openrvs-registry](https://github.com/willroberts/openrvs-registry), fetches server info using [openrvs-beacon](https://github.com/willroberts/openrvs-beacon), and then serves the data as JSON over HTTP on port `8081`
 - A build script (`build.bat`) which compiles the server for Windows (`stats.exe`) and Linux (`stats`)
-- A set of minimal HTML, JS, and CSS (`web` directory) to display the JSON
+- Rudimentary HTML, JS, and CSS (`web` directory) to display the JSON
 
 ## Running Stats App Locally
 
