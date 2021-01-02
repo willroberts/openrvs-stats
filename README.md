@@ -14,7 +14,7 @@ This repo contains:
 
 ## Testing Frontend Locally
 
-1. Once the stats app is running, you can visit `file:///path/to/web/index.html` to test HTML/JS/CSS changes
+1. Once the stats app is running, you can visit `file:///c/path/to/web/index.html` to test HTML/JS/CSS changes
 
 ## Deployment
 
