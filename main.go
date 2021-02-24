@@ -10,8 +10,8 @@ import (
 	"sync"
 	"time"
 
-	beacon "github.com/ijemafe/openrvs-beacon"
-	registry "github.com/ijemafe/openrvs-registry"
+	beacon "github.com/willroberts/openrvs-beacon"
+	registry "github.com/willroberts/openrvs-registry"
 )
 
 const RegistryURL = "http://127.0.0.1:8080/servers"
