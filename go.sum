@@ -1,4 +1,6 @@
 github.com/willroberts/openrvs-beacon v1.0.1 h1:T0xnkOb50e700CWWKsiTIajOLLXIsl2jhF3L+F1Pofg=
 github.com/willroberts/openrvs-beacon v1.0.1/go.mod h1:eKuzivb6pGifqXL5/+U4KFXyJGtgG3wL4tj9H45PHDo=
+github.com/willroberts/openrvs-beacon v1.0.2/go.mod h1:a4bo/oW8AVwv76P+AbUpOzrc320u84ObrTsJWDvcnuI=
 github.com/willroberts/openrvs-registry v1.0.1 h1:876+Cuo9IdnX4cKZr557pDG/JDyM2qL0TPIx+Ikj25E=
 github.com/willroberts/openrvs-registry v1.0.1/go.mod h1:HSzNmRAzU8aZgzgFYZHAedMBnucyhDH/rrSLaS/zMTg=
+github.com/willroberts/openrvs-registry v1.0.2/go.mod h1:eOF2pTmb1Db/Fp+R2VUTOPNkv+q972q69YfDRQb0Mi0=
