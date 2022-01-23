@@ -6,7 +6,7 @@ var windowLoaded = false;
 var coopModes = ["Hostage Rescue", "Mission", "Terrorist Hunt"];
 
 // Get stats JSON.
-xhr.open("GET", "http://64.225.54.237/stats.json");
+xhr.open("GET", "http://openrvs.org/stats.json");
 xhr.onreadystatechange = function () {
 	if (xhr.readyState !== XMLHttpRequest.DONE) {
 		return;
