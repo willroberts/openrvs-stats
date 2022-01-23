@@ -14,8 +14,8 @@ This repo contains:
 
 ## Testing Frontend Locally
 
-1. Once the stats app is running, you can visit `file:///c/path/to/web/index.html` to test HTML/JS/CSS changes
+Once the stats app is running, you can visit `file:///c/path/to/web/index.html` to test HTML/JS/CSS changes.
 
 ## Deployment
 
-The web frontend is currently deployed at http://openrvs.org/live, where it runs alongside the stats app and registry
+The web frontend is currently deployed at https://openrvs.org/live, where it runs alongside the stats app and registry.
