@@ -18,4 +18,4 @@ This repo contains:
 
 ## Deployment
 
-The web frontend is currently deployed at http://64.225.54.237/live, where it runs alongside the stats app and registry
+The web frontend is currently deployed at http://openrvs.org/live, where it runs alongside the stats app and registry
