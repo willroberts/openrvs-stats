@@ -2,17 +2,20 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"log"
 	"net/http"
 	"sync"
 	"time"
 )
 
-const RegistryURL = "http://127.0.0.1:8080/servers"
-
 var (
-	beaconTimeout     = 5 * time.Second
-	beaconInterval    = 15 * time.Second
+	registryURL        string
+	defaultRegistryURL = "http://127.0.0.1:8080/servers"
+
+	beaconTimeout  = 5 * time.Second
+	beaconInterval = 10 * time.Second
+
 	FriendlyGameModes = map[string]string{
 		"RGM_BombAdvMode":           "Bomb",
 		"RGM_DeathmatchMode":        "Survival",
@@ -23,10 +26,15 @@ var (
 		"RGM_TeamDeathmatchMode":    "Team Survival",
 		"RGM_TerroristHuntCoopMode": "Terrorist Hunt",
 	}
+
+	// Global server cache.
+	Servers = make([]ServerInfo, 0)
 )
 
-// Global server cache.
-var Servers = make([]ServerInfo, 0)
+func init() {
+	flag.StringVar(&registryURL, "registry-url", defaultRegistryURL, "Full URL for openrvs-registry")
+	flag.Parse()
+}
 
 func main() {
 	go pollServers()
@@ -48,48 +56,39 @@ func main() {
 // Continuously refreshes beacon data every `beaconInterval` seconds.
 func pollServers() {
 	for {
-		hostports, err := getHostPorts()
+		// Sleep early to avoid fast iterations on registry failures.
+		time.Sleep(beaconInterval)
+
+		// Retrieve healthy servers from openrvs-registry over HTTP.
+		healthyServers, err := getServersFromRegistry()
 		if err != nil {
 			log.Println(err)
 			continue
 		}
 
+		// Retrieve game info for healthy servers over UDP.
+		newServers := make([]ServerInfo, 0)
 		var wg sync.WaitGroup
-		var lock = sync.RWMutex{}
-		for _, hp := range hostports {
+		for _, hp := range healthyServers {
 			wg.Add(1)
-
 			go func(hp HostPort) {
+				// Get fresh server data.
 				info, err := populateBeaconData(hp)
 				if err != nil {
 					log.Println("beacon error:", err)
 					wg.Done()
 					return
 				}
-				lock.Lock()
-				for i, s := range Servers {
-					// Server is already in the list, update or remove it.
-					if info.IP == s.IP && info.Port == s.Port {
-						if info.CurrentPlayers > 0 {
-							Servers[i] = info
-						} else {
-							Servers = append(Servers[:i], Servers[i+1:]...)
-						}
-						lock.Unlock()
-						wg.Done()
-						return
-					}
-				}
-				// Server is not in the list, add it.
+				// Filter empty servers.
 				if info.CurrentPlayers > 0 {
-					Servers = append(Servers, info)
+					newServers = append(newServers, info)
 				}
-				lock.Unlock()
 				wg.Done()
 			}(hp)
 		}
 		wg.Wait()
-		log.Println("server info updated")
-		time.Sleep(beaconInterval)
+
+		// Rebuild server cache.
+		Servers = newServers
 	}
 }

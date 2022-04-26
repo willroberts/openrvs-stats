@@ -13,10 +13,10 @@ type HostPort struct {
 	Port int
 }
 
-// Retrieves healthy servers from openrvs-registry.
-func getHostPorts() ([]HostPort, error) {
+// Retrieves healthy servers from openrvs-registry over HTTP.
+func getServersFromRegistry() ([]HostPort, error) {
 	var hostports = make([]HostPort, 0)
-	resp, err := http.Get(RegistryURL)
+	resp, err := http.Get(registryURL)
 	if err != nil {
 		return nil, err
 	}
