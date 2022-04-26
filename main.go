@@ -14,7 +14,7 @@ var (
 	defaultRegistryURL = "http://127.0.0.1:8080/servers"
 
 	beaconTimeout  = 5 * time.Second
-	beaconInterval = 15 * time.Second
+	beaconInterval = 10 * time.Second
 
 	FriendlyGameModes = map[string]string{
 		"RGM_BombAdvMode":           "Bomb",
@@ -83,12 +83,12 @@ func pollServers() {
 				if info.CurrentPlayers > 0 {
 					newServers = append(newServers, info)
 				}
+				wg.Done()
 			}(hp)
 		}
 		wg.Wait()
 
 		// Rebuild server cache.
 		Servers = newServers
-		log.Println("server info updated")
 	}
 }
