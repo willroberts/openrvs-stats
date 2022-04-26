@@ -48,48 +48,39 @@ func main() {
 // Continuously refreshes beacon data every `beaconInterval` seconds.
 func pollServers() {
 	for {
-		hostports, err := getHostPorts()
+		// Sleep early to avoid fast iterations on registry failures.
+		time.Sleep(beaconInterval)
+
+		// Retrieve healthy servers from openrvs-registry over HTTP.
+		healthyServers, err := getServersFromRegistry()
 		if err != nil {
 			log.Println(err)
 			continue
 		}
 
+		// Retrieve game info for healthy servers over UDP.
+		newServers := make([]ServerInfo, 0)
 		var wg sync.WaitGroup
-		var lock = sync.RWMutex{}
-		for _, hp := range hostports {
+		for _, hp := range healthyServers {
 			wg.Add(1)
-
 			go func(hp HostPort) {
+				// Get fresh server data.
 				info, err := populateBeaconData(hp)
 				if err != nil {
 					log.Println("beacon error:", err)
 					wg.Done()
 					return
 				}
-				lock.Lock()
-				for i, s := range Servers {
-					// Server is already in the list, update or remove it.
-					if info.IP == s.IP && info.Port == s.Port {
-						if info.CurrentPlayers > 0 {
-							Servers[i] = info
-						} else {
-							Servers = append(Servers[:i], Servers[i+1:]...)
-						}
-						lock.Unlock()
-						wg.Done()
-						return
-					}
-				}
-				// Server is not in the list, add it.
+				// Filter empty servers.
 				if info.CurrentPlayers > 0 {
-					Servers = append(Servers, info)
+					newServers = append(newServers, info)
 				}
-				lock.Unlock()
-				wg.Done()
 			}(hp)
 		}
 		wg.Wait()
+
+		// Rebuild server cache.
+		Servers = newServers
 		log.Println("server info updated")
-		time.Sleep(beaconInterval)
 	}
 }
