@@ -2,17 +2,20 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"log"
 	"net/http"
 	"sync"
 	"time"
 )
 
-const RegistryURL = "http://127.0.0.1:8080/servers"
-
 var (
-	beaconTimeout     = 5 * time.Second
-	beaconInterval    = 15 * time.Second
+	registryURL        string
+	defaultRegistryURL = "http://127.0.0.1:8080/servers"
+
+	beaconTimeout  = 5 * time.Second
+	beaconInterval = 15 * time.Second
+
 	FriendlyGameModes = map[string]string{
 		"RGM_BombAdvMode":           "Bomb",
 		"RGM_DeathmatchMode":        "Survival",
@@ -23,10 +26,15 @@ var (
 		"RGM_TeamDeathmatchMode":    "Team Survival",
 		"RGM_TerroristHuntCoopMode": "Terrorist Hunt",
 	}
+
+	// Global server cache.
+	Servers = make([]ServerInfo, 0)
 )
 
-// Global server cache.
-var Servers = make([]ServerInfo, 0)
+func init() {
+	flag.StringVar(&registryURL, "registry-url", defaultRegistryURL, "Full URL for openrvs-registry")
+	flag.Parse()
+}
 
 func main() {
 	go pollServers()
